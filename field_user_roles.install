@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Implements hook_field_schema().
+ */
+function field_user_roles_field_schema($field) {
+  $columns = array(
+    'role' => array('type' => 'int', 'not null' => FALSE),
+  );
+  $indexes = array(
+    'role' => array('role'),
+  );
+  return array(
+    'columns' => $columns,
+    'indexes' => $indexes,
+  );
+}

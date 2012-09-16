@@ -1,0 +1,4 @@
+name = Field user roles
+description = A field to list the user roles.
+package = Fields
+core = 7.x

@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * Implements hook_field_info().
+ */
+function field_user_roles_field_info() {
+  return array(
+    'field_user_roles_role' => array(
+      'label' => t('Role'),
+      'description' => t('Selected role.'),
+      'default_widget' => 'field_user_roles_select',
+      'default_formatter' => 'field_user_roles_simple_text',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_validate().
+ */
+function field_user_roles_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  $options = user_roles(TRUE);
+  foreach ($items as $delta => $item) {
+    if (!empty($item['role'])) {
+      if (!isset($options[(int) $item['role']])) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'field_user_roles_invalid',
+          'message' => t('Role must be an integer.'),
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function field_user_roles_field_is_empty($item, $field) {
+  return empty($item['role']);
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function field_user_roles_field_formatter_info() {
+  return array(
+    'field_user_roles_simple_text' => array(
+      'label' => t('Simple text-based formatter'),
+      'field types' => array('field_user_roles_role'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function field_user_roles_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $options = user_roles(TRUE);
+
+  switch ($display['type']) {
+
+    case 'field_user_roles_simple_text':
+      foreach ($items as $delta => $item) {
+        $element[$delta] = array(
+          '#type' => 'html_tag',
+          '#tag' => 'p',
+          '#value' => $options[(int) $item['role']],
+        );
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function field_user_roles_field_widget_info() {
+  return array(
+    'field_user_roles_select' => array(
+      'label' => t('Role select'),
+      'field types' => array('field_user_roles_role'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function field_user_roles_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $value = isset($items[$delta]['role']) ? $items[$delta]['role'] : 0;
+
+  $widget = $element;
+  $widget['#delta'] = $delta;
+
+  switch ($instance['widget']['type']) {
+
+    case 'field_user_roles_select':
+      $options = array(0 => 'select...');
+      $options += user_roles(TRUE);
+      $widget += array(
+        '#type' => 'select',
+        '#default_value' => $value,
+        '#options' => $options,
+      );
+      break;
+  }
+
+  $element['role'] = $widget;
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function field_user_roles_field_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+    case 'field_user_roles_invalid':
+      form_error($element, $error['message']);
+      break;
+  }
+}
