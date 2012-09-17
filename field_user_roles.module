@@ -20,13 +20,11 @@ function field_user_roles_field_info() {
 function field_user_roles_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
   $options = user_roles(TRUE);
   foreach ($items as $delta => $item) {
-    if (!empty($item['role'])) {
-      if (!isset($options[(int) $item['role']])) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'field_user_roles_invalid',
-          'message' => t('Role must be an integer.'),
-        );
-      }
+    if (!isset($options[(int)$item['role']])) {
+      $errors[$field['field_name']][$langcode][$delta][] = array(
+        'error' => 'field_user_roles_invalid',
+        'message' => t('Role must exist.'),
+      );
     }
   }
 }
@@ -35,7 +33,7 @@ function field_user_roles_field_validate($entity_type, $entity, $field, $instanc
  * Implements hook_field_is_empty().
  */
 function field_user_roles_field_is_empty($item, $field) {
-  return empty($item['role']);
+  return NULL;
 }
 
 /**
