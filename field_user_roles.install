@@ -5,10 +5,10 @@
  */
 function field_user_roles_field_schema($field) {
   $columns = array(
-    'role' => array('type' => 'int', 'not null' => FALSE),
+    'rid' => array('type' => 'int', 'not null' => FALSE),
   );
   $indexes = array(
-    'role' => array('role'),
+    'rid' => array('rid'),
   );
   return array(
     'columns' => $columns,

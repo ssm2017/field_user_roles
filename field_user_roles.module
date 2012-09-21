@@ -5,7 +5,7 @@
  */
 function field_user_roles_field_info() {
   return array(
-    'field_user_roles_role' => array(
+    'field_user_roles_rid' => array(
       'label' => t('Role'),
       'description' => t('Selected role.'),
       'default_widget' => 'field_user_roles_select',
@@ -20,7 +20,8 @@ function field_user_roles_field_info() {
 function field_user_roles_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
   $options = user_roles(TRUE);
   foreach ($items as $delta => $item) {
-    if (!isset($options[(int)$item['role']])) {
+    $rid = (int)$item['rid'];
+    if ($rid && !isset($options[$rid])) {
       $errors[$field['field_name']][$langcode][$delta][] = array(
         'error' => 'field_user_roles_invalid',
         'message' => t('Role must exist.'),
@@ -33,7 +34,10 @@ function field_user_roles_field_validate($entity_type, $entity, $field, $instanc
  * Implements hook_field_is_empty().
  */
 function field_user_roles_field_is_empty($item, $field) {
-  return NULL;
+  if (empty($item['rid']) && $item['rid'] == '0') {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**
@@ -43,7 +47,7 @@ function field_user_roles_field_formatter_info() {
   return array(
     'field_user_roles_simple_text' => array(
       'label' => t('Simple text-based formatter'),
-      'field types' => array('field_user_roles_role'),
+      'field types' => array('field_user_roles_rid'),
     ),
   );
 }
@@ -62,7 +66,7 @@ function field_user_roles_field_formatter_view($entity_type, $entity, $field, $i
         $element[$delta] = array(
           '#type' => 'html_tag',
           '#tag' => 'p',
-          '#value' => $options[(int) $item['role']],
+          '#value' => $options[(int)$item['rid']],
         );
       }
       break;
@@ -78,7 +82,7 @@ function field_user_roles_field_widget_info() {
   return array(
     'field_user_roles_select' => array(
       'label' => t('Role select'),
-      'field types' => array('field_user_roles_role'),
+      'field types' => array('field_user_roles_rid'),
     ),
   );
 }
@@ -87,7 +91,7 @@ function field_user_roles_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function field_user_roles_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $value = isset($items[$delta]['role']) ? $items[$delta]['role'] : 0;
+  $value = isset($items[$delta]['rid']) ? $items[$delta]['rid'] : 0;
 
   $widget = $element;
   $widget['#delta'] = $delta;
@@ -105,7 +109,7 @@ function field_user_roles_field_widget_form(&$form, &$form_state, $field, $insta
       break;
   }
 
-  $element['role'] = $widget;
+  $element['rid'] = $widget;
   return $element;
 }
 
